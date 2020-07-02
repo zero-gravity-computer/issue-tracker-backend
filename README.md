@@ -16,6 +16,7 @@ A web application backend built with [Django](https://www.djangoproject.com/)!
 * Add file to staging area: `git add <file_name>`
 * Add all files to staging area: `git add .`
 * Add dir to staging area: `git add <directory name>/*`
+* Unstage file: `git reset <file_name>`
 * Commit staged files: `git commit -m "<commit message>"`
 * Push local changes to origin: `git push`
 * List commit log (press "q" to exit log): `git log`
