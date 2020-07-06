@@ -34,16 +34,27 @@ class Severity(models.Model):
         choices=Severity_Choices,
         default=Medium
     )
-class Group(models.Model):
+    
+class Organization(models.Model):
     name = models.CharField(max_length=150)
-
-class GroupMembership(models.Model):
+ 
+class Team(models.Model):
+    contributor = models.ManyToManyField(
+        Contributor,
+    )
+    team = models.ForeignKey(
+        Organization,
+        on_delete=models.CASCADE
+    )
+    is_owner = models.BooleanField()
+    
+class TeamMembership(models.Model):
     contributor = models.ForeignKey(
         Contributor,
         on_delete=models.CASCADE
     )
-    group = models.ForeignKey(
-        Group,
+    team = models.ForeignKey(
+        Organization,
         on_delete=models.CASCADE
     )
     is_owner = models.BooleanField()
@@ -56,6 +67,16 @@ class Issue(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
+    organization = models.OneToOneField(
+        Organization,
+        on_delete=models.CASCADE,
+    )
+    team = models.OneToOneField(
+        Team,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
 
 class Comment(models.Model):
     body = models.CharField(max_length=2048)
