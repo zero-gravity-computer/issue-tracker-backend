@@ -37,6 +37,17 @@ class Severity(models.Model):
 class Group(models.Model):
     name = models.CharField(max_length=150)
 
+class GroupMembership(models.Model):
+    contributor = models.ForeignKey(
+        Contributor,
+        on_delete=models.CASCADE
+    )
+    group = models.ForeignKey(
+        Group,
+        on_delete=models.CASCADE
+    )
+    is_owner = models.BooleanField()
+
 class Issue(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=2048)
