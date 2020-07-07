@@ -2,13 +2,20 @@ from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser
 from django import forms
 
-class Contributor(AbstractBaseUser):
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        abstract = True
+
+class Contributor(TimeStampedModel, AbstractBaseUser):
     username = models.CharField(max_length=15, unique=True)
     USERNAME_FIELD = "username"
     email = models.EmailField(max_length=300)
     bio = models.CharField(max_length=1000)
+    
 
-class Status(models.Model):
+class Status(TimeStampedModel):
     not_started = 0
     in_progress = 1
     completed = 2
@@ -21,7 +28,7 @@ class Status(models.Model):
         choices=status_choices,
         default=not_started
     )
-class Severity(models.Model):
+class Severity(TimeStampedModel):
     low = 0
     medium = 1
     high = 2
@@ -34,10 +41,10 @@ class Severity(models.Model):
         choices=severity_choices,
         default=medium
     )
-  class Organization(models.Model):
+class Organization(TimeStampedModel):
     name = models.CharField(max_length=150)
  
-class Team(models.Model):
+class Team(TimeStampedModel):
     name = models.CharField(max_length=80)
     contributor = models.ManyToManyField(
         Contributor,
@@ -48,7 +55,7 @@ class Team(models.Model):
     )
     is_owner = models.BooleanField()
     
-class TeamMembership(models.Model):
+class TeamMembership(TimeStampedModel):
     contributor = models.ForeignKey(
         Contributor,
         on_delete=models.CASCADE
@@ -58,7 +65,7 @@ class TeamMembership(models.Model):
         on_delete=models.CASCADE
     )
 
-class Issue(models.Model):
+class Issue(TimeStampedModel):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=2048)
     author = models.OneToOneField(
@@ -75,7 +82,7 @@ class Issue(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
-class Comment(models.Model):
+class Comment(TimeStampedModel):
     body = models.CharField(max_length=2048)
     author = models.OneToOneField(
         Contributor,
