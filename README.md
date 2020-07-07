@@ -20,3 +20,9 @@ A web application backend built with [Django](https://www.djangoproject.com/)!
 * Commit staged files: `git commit -m "<commit message>"`
 * Push local changes to origin: `git push`
 * List commit log (press "q" to exit log): `git log`
+* Import origin changes to local machine: `git pull`
+* Merge current branch with master: `git push --set-upstream origin <branch name>`
+
+# Django Snippets 
+* Create new model instance: `instance_name = Class(trait, etc)`
+  * When new instance has a relationship, another variable is required within trait list

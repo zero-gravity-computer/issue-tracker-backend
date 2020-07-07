@@ -9,30 +9,30 @@ class Contributor(AbstractBaseUser):
     bio = models.CharField(max_length=1000)
 
 class Status(models.Model):
-    Not_Started = 0
-    In_Progress = 1
-    Completed = 2
-    Status_Choices = [
-        (Not_Started, 'Not Started'),
-        (In_Progress, 'In Progress'),
-        (Completed, 'Completed'),
+    not_started = 0
+    in_progress = 1
+    completed = 2
+    status_choices = [
+        (not_started, 'Not Started'),
+        (in_progress, 'In Progress'),
+        (completed, 'Completed'),
     ]
-    status_choices = models.IntegerField(
-        choices=Status_Choices,
-        default=Not_Started
+    status = models.IntegerField(
+        choices=status_choices,
+        default=not_started
     )
 class Severity(models.Model):
-    Low = 0
-    Medium = 1
-    High = 2
-    Severity_Choices = [
-        (Low, 'Low'),
-        (Medium, 'Medium'),
-        (High, 'High'),
+    low = 0
+    medium = 1
+    high = 2
+    severity_choices = [
+        (low, 'Low'),
+        (medium, 'Medium'),
+        (high, 'High'),
     ]
-    Severity_choices = models.IntegerField(
-        choices=Severity_Choices,
-        default=Medium
+    severity = models.IntegerField(
+        choices=severity_choices,
+        default=medium
     )
   class Organization(models.Model):
     name = models.CharField(max_length=150)
