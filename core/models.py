@@ -39,10 +39,11 @@ class Organization(models.Model):
     name = models.CharField(max_length=150)
  
 class Team(models.Model):
+    name = models.CharField(max_length=80)
     contributor = models.ManyToManyField(
         Contributor,
     )
-    team = models.ForeignKey(
+    organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE
     )
@@ -54,10 +55,9 @@ class TeamMembership(models.Model):
         on_delete=models.CASCADE
     )
     team = models.ForeignKey(
-        Organization,
+        Team,
         on_delete=models.CASCADE
     )
-    is_owner = models.BooleanField()
 
 class Issue(models.Model):
     title = models.CharField(max_length=100)
