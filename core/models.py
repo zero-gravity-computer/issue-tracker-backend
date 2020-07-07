@@ -34,8 +34,7 @@ class Severity(models.Model):
         choices=Severity_Choices,
         default=Medium
     )
-    
-class Organization(models.Model):
+  class Organization(models.Model):
     name = models.CharField(max_length=150)
  
 class Team(models.Model):
@@ -76,8 +75,6 @@ class Issue(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
-
-
 class Comment(models.Model):
     body = models.CharField(max_length=2048)
     author = models.OneToOneField(
