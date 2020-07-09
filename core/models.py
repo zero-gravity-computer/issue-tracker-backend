@@ -13,6 +13,8 @@ class Contributor(TimeStampedModel, AbstractBaseUser):
     USERNAME_FIELD = "username"
     email = models.EmailField(max_length=300)
     bio = models.CharField(max_length=1000)
+    
+
 
 class Organization(models.Model):
     name = models.CharField(max_length=80, unique=True)
@@ -39,7 +41,7 @@ class TeamMembership(TimeStampedModel):
     )
 
 class Issue(TimeStampedModel):
-    
+   
     class Severity(models.TextChoices):
         low = 'Low'
         medium = 'Medium'
@@ -61,7 +63,6 @@ class Issue(TimeStampedModel):
         choices=Status.choices,
         default=Status.not_started,
         )
-
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=2048)
     author = models.ForeignKey(
@@ -73,8 +74,6 @@ class Issue(TimeStampedModel):
         Organization,
         on_delete=models.CASCADE,
     )
-
-
 class Comment(TimeStampedModel):
     body = models.CharField(max_length=2048)
     author = models.ForeignKey(
