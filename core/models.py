@@ -13,37 +13,10 @@ class Contributor(TimeStampedModel, AbstractBaseUser):
     USERNAME_FIELD = "username"
     email = models.EmailField(max_length=300)
     bio = models.CharField(max_length=1000)
-    
 
-class Status(TimeStampedModel):
-    not_started = 0
-    in_progress = 1
-    completed = 2
-    status_choices = [
-        (not_started, 'Not Started'),
-        (in_progress, 'In Progress'),
-        (completed, 'Completed'),
-    ]
-    status = models.IntegerField(
-        choices=status_choices,
-        default=not_started
-    )
-class Severity(TimeStampedModel):
-    low = 0
-    medium = 1
-    high = 2
-    severity_choices = [
-        (low, 'Low'),
-        (medium, 'Medium'),
-        (high, 'High'),
-    ]
-    severity = models.IntegerField(
-        choices=severity_choices,
-        default=medium
-    )
-class Organization(TimeStampedModel):
-    name = models.CharField(max_length=150)
- 
+class Organization(models.Model):
+    name = models.CharField(max_length=80, unique=True)
+
 class Team(TimeStampedModel):
     name = models.CharField(max_length=80)
     contributor = models.ManyToManyField(
@@ -53,7 +26,7 @@ class Team(TimeStampedModel):
         Organization,
         on_delete=models.CASCADE
     )
-    is_owner = models.BooleanField()
+
     
 class TeamMembership(TimeStampedModel):
     contributor = models.ForeignKey(
@@ -66,31 +39,50 @@ class TeamMembership(TimeStampedModel):
     )
 
 class Issue(TimeStampedModel):
+    
+    class Severity(models.TextChoices):
+        low = 'Low'
+        medium = 'Medium'
+        high = 'High'
+
+    severity = models.CharField(
+        max_length=32,
+        choices=Severity.choices,
+        default=Severity.medium,
+    )
+        
+    class Status(models.TextChoices):
+        not_started = 'Not Started'
+        in_progress = 'In Progress'
+        completed = 'Completed'
+        
+    status = models.CharField(
+        max_length=32,
+        choices=Status.choices,
+        default=Status.not_started,
+        )
+
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=2048)
-    author = models.OneToOneField(
+    author = models.ForeignKey(
         Contributor,
         on_delete=models.SET_NULL,
         null=True
     )
-    organization = models.OneToOneField(
+    organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,
     )
-    team = models.OneToOneField(
-        Team,
-        on_delete=models.SET_NULL,
-        null=True
-    )
+
+
 class Comment(TimeStampedModel):
     body = models.CharField(max_length=2048)
-    author = models.OneToOneField(
+    author = models.ForeignKey(
         Contributor,
         on_delete=models.SET_NULL,
         null=True,
     )
-    issue = models.OneToOneField(
+    issue = models.ForeignKey(
         Issue,
         on_delete=models.CASCADE,
     ) 
-
