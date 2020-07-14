@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core import views
+from core import views, models
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('issues/', views.read_issues),
+    path(r'issues/', views.read_issues),
+    path(r'issues/<id>', views.read_issue),
+    #path(r'contributors/<id>', views.read_many(models.Contributor)),
 ]
