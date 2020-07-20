@@ -1,21 +1,9 @@
 from django.core import serializers
 from core import models
 import datetime
+import json
 
-''' original serializers:
-
-
-def json_many(model):
-    data = serializers.serialize("json", model.objects.all())
-    return data
-
-
-def json_one(model, id):
-    data = serializers.serialize("json", [model.objects.get(id=id)])
-    return data
-
-'''
-def ModelToDict(obj):
+def model_to_dict(obj):
     result = {}
     for field in obj._meta.fields:
         value = getattr(obj, field.name)
@@ -30,8 +18,19 @@ def ModelToDict(obj):
         result[field.name] = value
     return result
 
-#runs test of an object
-'''from core.models import Team
-i = Team.objects.get(id=1)
-print(ModelToDict(i))'''
 
+
+def serialize(obj):
+    dictionary = model_to_dict(obj)
+    return json.dumps(dictionary)
+
+def serialize_many(obj_list):
+    dictionaries = [model_to_dict(obj) for obj in obj_list]
+    return json.dumps(dictionaries)
+
+'''
+#runs test of an object
+from core.models import Issue
+i = Issue.objects.all()
+print(serialize_many(i))
+'''
