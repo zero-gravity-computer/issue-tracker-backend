@@ -20,13 +20,13 @@ def model_to_dict(obj):
 
 
 
-def serialize(obj):
+def serialize(obj, indent=2):
     dictionary = model_to_dict(obj)
-    return json.dumps(dictionary)
+    return json.dumps(dictionary, indent=indent)
 
-def serialize_many(obj_list):
+def serialize_many(obj_list, indent=2):
     dictionaries = [model_to_dict(obj) for obj in obj_list]
-    return json.dumps(dictionaries)
+    return json.dumps(dictionaries, indent=indent)
 
 '''
 #runs test of an object
