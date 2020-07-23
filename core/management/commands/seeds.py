@@ -23,7 +23,7 @@ class Command(BaseCommand):
         count = 8
         for x in range(count):
             models.Team.objects.create(
-                name = fake.name(),
+                name = choice(["design", "accounting", "engineering", "marketing", "HR"]),
                 organization = choice(models.Organization.objects.all()),
             )
         self.success(f"inserted {count} Teams")
