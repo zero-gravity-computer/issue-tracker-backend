@@ -30,5 +30,6 @@ urlpatterns = [
     path(r'teammemberships/<id>.json/', views.read_one(models.TeamMembership)),
     path(r'comments.json/', views.read_many(models.Comment)),
     path(r'comments/<id>.json/', views.read_one(models.Comment)),
+    path(r'test', views.test)
     #path(r'contributors/<id>', views.read_many(models.Contributor)),
 ]

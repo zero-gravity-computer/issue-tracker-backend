@@ -14,3 +14,16 @@ def read_one(model):
         data = serializers.serialize(obj)
         return HttpResponse(data, content_type="application/json")
     return request_handler
+
+
+#test view is below
+
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def test(request):
+    if request.method =='POST':
+        return HttpResponse('WOO')
+    else:
+        return HttpResponse('use POST')
+
