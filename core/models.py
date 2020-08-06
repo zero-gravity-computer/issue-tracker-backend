@@ -21,9 +21,6 @@ class Organization(models.Model):
 
 class Team(TimeStampedModel):
     name = models.CharField(max_length=80)
-    contributor = models.ManyToManyField(
-        Contributor,
-    )
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE
