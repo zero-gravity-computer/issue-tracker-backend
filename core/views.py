@@ -34,8 +34,8 @@ def create_one(model):
                     related_model = field.field.related_model
                     data[key] = related_model.objects.get(id = data[key])
 
-            model.objects.create(**data)
-            return HttpResponse(str(data))
+            m = model.objects.create(**data)
+            return HttpResponse(serializers.serialize(m))
         else:
             return HttpResponse('use POST')
     return request_handler
