@@ -2,6 +2,7 @@ from django.http import JsonResponse, HttpResponse
 import core
 from core import models, serializers
 import json
+from django.views.decorators.csrf import csrf_exempt
 
 def read_many(model):
     def request_handler(request):
@@ -10,23 +11,14 @@ def read_many(model):
         return HttpResponse(data, content_type="application/json")
     return request_handler
 
+
 def read_one(model):
     def request_handler(request, id):
         obj = model.objects.get(id=id)
         data = serializers.serialize(obj)
         return HttpResponse(data, content_type="application/json")
     return request_handler
-
-
-#test view is below
-
-from django.views.decorators.csrf import csrf_exempt
-
-def field_is_relational(field, model):
-    return "fields.related" in str(getattr(model , field))
-    
-
-
+  
 
 def create_one(model):
     @csrf_exempt
@@ -46,4 +38,17 @@ def create_one(model):
             return HttpResponse(str(data))
         else:
             return HttpResponse('use POST')
+    return request_handler
+
+
+def resource(model):
+    @csrf_exempt
+    def request_handler(request, id=None):
+        if request.method =='POST':
+            return create_one(model)(request)
+        elif request.method =='GET':
+            if id:
+                return read_one(model)(request, id)
+            else:
+                return read_many(model)(request)
     return request_handler

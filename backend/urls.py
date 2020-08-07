@@ -14,22 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from core import views, models
 
 urlpatterns = [
-    path(r'issues.json/', views.read_many(models.Issue)),
-    path(r'issues/<id>.json/', views.read_one(models.Issue)),
-    path(r'contributors.json/', views.read_many(models.Contributor)),
-    path(r'contributors/<id>.json/', views.read_one(models.Contributor)),
-    path(r'organizations.json/', views.read_many(models.Organization)),
-    path(r'organizations/<id>.json/', views.read_one(models.Organization)),
-    path(r'teams.json/', views.read_many(models.Team)),
-    path(r'teams/<id>.json/', views.read_one(models.Team)),
-    path(r'teammemberships.json/', views.read_many(models.TeamMembership)),
-    path(r'teammemberships/<id>.json/', views.read_one(models.TeamMembership)),
-    path(r'comments.json/', views.read_many(models.Comment)),
-    path(r'comments/<id>.json/', views.read_one(models.Comment)),
-    path(r'test2/', views.create_one(models.Team))
-    #path(r'contributors/<id>', views.read_many(models.Contributor)),
+    re_path(r'issues/(?P<id>\d+)|issues', views.resource(models.Issue)),
+    re_path(r'contributors/(?P<id>\d+)|contributors', views.resource(models.Contributor)),
+    re_path(r'organizations/(?P<id>\d+)|organizations', views.resource(models.Organization)),
+    re_path(r'teams/(?P<id>\d+)|teams', views.resource(models.Team)),
+    re_path(r'team_memberships/(?P<id>\d+)|team_memberships', views.resource(models.TeamMembership)),
+    re_path(r'comments/(?P<id>\d+)|comments', views.resource(models.Comment)),
 ]
