@@ -23,5 +23,5 @@ urlpatterns = [
     re_path(r'organizations/(?P<id>\d+)|organizations', views.resource(models.Organization)),
     re_path(r'teams/(?P<id>\d+)|teams', views.resource(models.Team)),
     re_path(r'team_memberships/(?P<id>\d+)|team_memberships', views.resource(models.TeamMembership)),
-    re_path(r'comments/(?P<id>\d+)|comments', views.resource(models.Comment)),
+    re_path(r'comments/(?P<id>\d+)|comments', views.resource(models.Comment)),    
 ]
