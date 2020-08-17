@@ -12,10 +12,17 @@ invalid_json_err = {"message" : "Request body is not valid json"}
 missing_id_err = {"message" : "required id not provided"}
 invalid_data_err = {"message" : "invalid data type received"}
 unsupported_method_err = {"message" : "request method not supported by url"}
+invalid_filter_params = {"message": "invalid filter parameters"}
 
 def read_many(model):
     def request_handler(request):
-        obj_list = model.objects.all()
+        try:
+            # Use query strings to filter results
+            params = { key: request.GET.get(key) for key in request.GET }
+            obj_list = model.objects.filter(**params)
+        except:
+            return JsonResponse({"errors": [invalid_filter_params]})
+
         data = list(map(serializers.model_to_dict, obj_list))
         return JsonResponse({"data": data})
     return request_handler
