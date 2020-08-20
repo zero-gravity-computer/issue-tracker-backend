@@ -13,10 +13,25 @@ missing_id_err = {"message" : "required id not provided"}
 invalid_data_err = {"message" : "invalid data type received"}
 unsupported_method_err = {"message" : "request method not supported by url"}
 
+
 def read_many(model):
     def request_handler(request):
-        obj_list = model.objects.all()
-        data = list(map(serializers.model_to_dict, obj_list))
+        params = { key: request.GET.get(key) for key in request.GET }
+        filter_set=None
+
+        #applies smart filters from django
+        for key in params:
+            try:
+                filter_set = model.objects.filter(**{key : params[key]})
+            except:
+                pass
+        
+        #gets all results if no filter is provided
+        if filter_set is None:
+            filter_set = model.objects.all()
+
+        #retrieves results
+        data = list(map(serializers.model_to_dict, filter_set))
         return JsonResponse({"data": data})
     return request_handler
 
