@@ -16,14 +16,18 @@ invalid_filter_params = {"message": "invalid filter parameters"}
 
 def read_many(model):
     def request_handler(request):
-        try:
             # Use query strings to filter results
-            params = { key: request.GET.get(key) for key in request.GET }
-            obj_list = model.objects.filter(**params)
-        except:
-            return JsonResponse({"errors": [invalid_filter_params]})
+        params = { key: request.GET.get(key) for key in request.GET }
+        filter_set=None
+        for key in params:
+            try:
+                filter_set = model.objects.filter(**{key : params[key]})
 
-        data = list(map(serializers.model_to_dict, obj_list))
+            except:
+                pass
+        if filter_set is None:
+            filter_set = model.objects.all()
+        data = list(map(serializers.model_to_dict, filter_set))
         return JsonResponse({"data": data})
     return request_handler
 
