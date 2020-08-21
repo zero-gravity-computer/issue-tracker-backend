@@ -3,6 +3,7 @@ import core
 from core import models, serializers
 import json
 from django.views.decorators.csrf import csrf_exempt
+from cursor_pagination import CursorPaginator
 
 
 id_not_exists_err = {"message": "Requested id does not exist" }
@@ -26,13 +27,34 @@ def read_many(model):
             except:
                 pass
         
-        #gets all results if no filter is provided
+        # gets all results if no filter is provided
         if filter_set is None:
             filter_set = model.objects.all()
 
-        #retrieves results
-        data = list(map(serializers.model_to_dict, filter_set))
-        return JsonResponse({"data": data})
+        # paginate results
+        after = params.get("after")
+        
+        # First
+        if params.get('first'):
+            first = int(params.get('first'))
+        else:
+            first = 100
+
+        paginator = CursorPaginator(filter_set, ordering=('-created_at', '-id'))
+
+         # TODO using after creates database errors
+        page = paginator.page(first=first, after=after)
+
+        # Convert model instances to dictionaries
+        data = list(map(serializers.model_to_dict, page))
+
+        return JsonResponse({
+            'has_next_page': page.has_next,
+            # TODO page index may not exist
+            'last_cursor': paginator.cursor(page[-1]),
+            'data': data,
+        })
+        
     return request_handler
 
 
