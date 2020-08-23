@@ -5,6 +5,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 import dateutil.parser
 from django.db.models.fields import DateTimeField
+from django.utils.timezone import make_aware
 
 
 id_not_exists_err = {"message": "Requested id does not exist" }
@@ -39,7 +40,8 @@ def read_many(model):
         for key in params:
             for field in date_fields(model):
                 if key.startswith(field):
-                    params[key] = dateutil.parser.parse(params[key])
+                    naive_date = dateutil.parser.parse(params[key])
+                    params[key] = make_aware(naive_date)
 
         #applies smart filters from django
         for key in params:
