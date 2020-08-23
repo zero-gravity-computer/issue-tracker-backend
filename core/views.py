@@ -33,6 +33,7 @@ def read_many(model):
         #retrieves results
         data = list(map(serializers.model_to_dict, filter_set))
         return JsonResponse({"data": data})
+
     return request_handler
 
 
