@@ -3,6 +3,8 @@ import core
 from core import models, serializers
 import json
 from django.views.decorators.csrf import csrf_exempt
+import dateutil.parser
+from django.db.models.fields import DateTimeField
 
 
 id_not_exists_err = {"message": "Requested id does not exist" }
@@ -14,10 +16,30 @@ invalid_data_err = {"message" : "invalid data type received"}
 unsupported_method_err = {"message" : "request method not supported by url"}
 
 
+
+def date_fields(model):
+    '''
+    Return a list of strings that correspond to a model's
+    fields that are instances of DateTimeField
+    '''
+    def is_date_field(name):
+        return type(getattr(model, name).field) == DateTimeField
+    
+    field_names = [f.name for f in model._meta.fields]
+    return list(filter(is_date_field, field_names))
+
+
+
 def read_many(model):
     def request_handler(request):
         params = { key: request.GET.get(key) for key in request.GET }
         filter_set=None
+
+        # Parsing incoming date fields
+        for key in params:
+            for field in date_fields(model):
+                if key.startswith(field):
+                    params[key] = dateutil.parser.parse(params[key])
 
         #applies smart filters from django
         for key in params:
