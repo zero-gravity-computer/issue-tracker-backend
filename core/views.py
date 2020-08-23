@@ -40,8 +40,13 @@ def read_many(model):
         for key in params:
             for field in date_fields(model):
                 if key.startswith(field):
-                    naive_date = dateutil.parser.parse(params[key])
-                    params[key] = make_aware(naive_date)
+                    try:
+                        naive_date = dateutil.parser.parse(params[key])
+                        params[key] = make_aware(naive_date)
+                    except:
+                        message = f"Invalid date string provided for field {key}"
+                        invalid_date_err = { "message": message }
+                        return JsonResponse({"errors": [invalid_date_err]})
 
         #applies smart filters from django
         for key in params:
