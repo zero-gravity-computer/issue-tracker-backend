@@ -35,7 +35,7 @@ def date_fields(model):
 def read_many(model):
     def request_handler(request):
         params = { key: request.GET.get(key) for key in request.GET }
-        filter_set=None
+        queryset = None
 
         # Parsing incoming date fields
         for key in params:
@@ -52,30 +52,27 @@ def read_many(model):
         #applies smart filters from django
         for key in params:
             try:
-                filter_set = model.objects.filter(**{key : params[key]})
+                queryset = model.objects.filter(**{key : params[key]})
             except:
                 pass
         
         # gets all results if no filter is provided
-        if filter_set is None:
-            filter_set = model.objects.all()
+        if queryset is None:
+            queryset = model.objects.all()
 
         # paginate results
         after = params.get("after")
 
-        
         # First
         if params.get('first'):
             first = int(params.get('first'))
         else:
             first = 100
 
-        paginator = CursorPaginator(filter_set, ordering=('-created_at', '-id'))
-        
+        paginator = CursorPaginator(queryset, ordering=('id', 'created_at'))
 
-         # TODO using after creates database errors
+        # TODO must support before + last params
         page = paginator.page(first=first, after=after)
-
 
         # Convert model instances to dictionaries
         data = list(map(serializers.model_to_dict, page))
@@ -83,7 +80,8 @@ def read_many(model):
         return JsonResponse({
             'has_next_page': page.has_next,
             # TODO page index may not exist
-            'last_cursor': paginator.cursor(page[0]),
+            'first_cursor': paginator.cursor(page[0]),
+            'last_cursor': paginator.cursor(page[-1]),
             'data': data,
         })
         
