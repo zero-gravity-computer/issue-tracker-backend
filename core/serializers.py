@@ -11,6 +11,7 @@ def model_to_dict(obj):
         #handles datetime fields
         if type(value) == datetime.datetime:
             value = value.isoformat()
+
         #handles relational fields 
         if hasattr(value, "id"):
             value = value.id

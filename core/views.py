@@ -4,6 +4,9 @@ from core import models, serializers
 import json
 from django.views.decorators.csrf import csrf_exempt
 from core.pagination import CursorPaginator
+import dateutil.parser
+from django.db.models.fields import DateTimeField
+from django.utils.timezone import make_aware
 
 
 id_not_exists_err = {"message": "Requested id does not exist" }
@@ -15,10 +18,36 @@ invalid_data_err = {"message" : "invalid data type received"}
 unsupported_method_err = {"message" : "request method not supported by url"}
 
 
+
+def date_fields(model):
+    '''
+    Return a list of strings that correspond to a model's
+    fields that are instances of DateTimeField
+    '''
+    def is_date_field(name):
+        return type(getattr(model, name).field) == DateTimeField
+    
+    field_names = [f.name for f in model._meta.fields]
+    return list(filter(is_date_field, field_names))
+
+
+
 def read_many(model):
     def request_handler(request):
         params = { key: request.GET.get(key) for key in request.GET }
         filter_set=None
+
+        # Parsing incoming date fields
+        for key in params:
+            for field in date_fields(model):
+                if key.startswith(field):
+                    try:
+                        naive_date = dateutil.parser.parse(params[key])
+                        params[key] = make_aware(naive_date)
+                    except:
+                        message = f"Invalid date string provided for field {key}"
+                        invalid_date_err = { "message": message }
+                        return JsonResponse({"errors": [invalid_date_err]})
 
         #applies smart filters from django
         for key in params:
