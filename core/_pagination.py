@@ -27,23 +27,25 @@ def decode_cursor(cursor):
         "created_at": field_strings[1],
     }
 
-def get_page(queryset, first, after):
-    fields = decode_cursor(after)
-    id = fields["id"]
-    created_at = fields["created_at"]
-    page = queryset.filter(id__gte=id, created_at__gte=created_at)[:first]
-    return page
+def get_page(queryset, first, after=None):
+    if after is None:
+        page = queryset.all()[:first]
+        return page
+    else:
+        fields = decode_cursor(after)
+        id = fields["id"]
+        created_at = fields["created_at"]
+        page = queryset.filter(id__gte=id, created_at__gte=created_at)[:first]
+        return page
 
 
-'''
+#Testing Materials
 
-TESTING MATERIALS:
 
 from core import models
 c = models.Contributor.objects.all()
 x = c[4]
 cursor = encode_cursor(x)
-page = get_page(c, 8, cursor)
+page = get_page(c, 8)
 print(page)
 
-'''
