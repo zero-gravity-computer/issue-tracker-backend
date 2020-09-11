@@ -27,17 +27,18 @@ def decode_cursor(cursor):
         "created_at": field_strings[1],
     }
 
-    id = "9dsajtkj|kdjfaksj|skfdjlkj"
+def apply_pagination(queryset, first, after):
+    fields = decode_cursor(after)
+    id = fields["id"]
+    created_at = fields["created_at"]
+    page = queryset.filter(id__gte=id, created_at__gte=created_at)[:first]
+    return page
 
-    def apply_Pagination(queryset, first, after):
-        decode_cursor(after)
-        page = queryset.filter(id_gte=id, created_at_gte=created_at)
-        return page
 
 
-
-# from core import models
-# c = models.Contributor.objects.first()
-# cursor = encode_cursor(c)
-# fields = decode_cursor(cursor)
-# print(models.Contributor.objects.get(id=fields['id'], created_at=fields['created_at']))
+from core import models
+c = models.Contributor.objects.all()
+x = c[4]
+cursor = encode_cursor(x)
+page = apply_pagination(c, 8, cursor)
+print(page)
