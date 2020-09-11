@@ -4,6 +4,9 @@ from core import models, serializers
 import json
 from django.views.decorators.csrf import csrf_exempt
 from core.pagination import CursorPaginator
+import dateutil.parser
+from django.db.models.fields import DateTimeField
+from django.utils.timezone import make_aware
 
 
 id_not_exists_err = {"message": "Requested id does not exist" }
@@ -15,38 +18,61 @@ invalid_data_err = {"message" : "invalid data type received"}
 unsupported_method_err = {"message" : "request method not supported by url"}
 
 
+
+def date_fields(model):
+    '''
+    Return a list of strings that correspond to a model's
+    fields that are instances of DateTimeField
+    '''
+    def is_date_field(name):
+        return type(getattr(model, name).field) == DateTimeField
+    
+    field_names = [f.name for f in model._meta.fields]
+    return list(filter(is_date_field, field_names))
+
+
+
 def read_many(model):
     def request_handler(request):
         params = { key: request.GET.get(key) for key in request.GET }
-        filter_set=None
+        queryset = None
+
+        # Parsing incoming date fields
+        for key in params:
+            for field in date_fields(model):
+                if key.startswith(field):
+                    try:
+                        naive_date = dateutil.parser.parse(params[key])
+                        params[key] = make_aware(naive_date)
+                    except:
+                        message = f"Invalid date string provided for field {key}"
+                        invalid_date_err = { "message": message }
+                        return JsonResponse({"errors": [invalid_date_err]})
 
         #applies smart filters from django
         for key in params:
             try:
-                filter_set = model.objects.filter(**{key : params[key]})
+                queryset = model.objects.filter(**{key : params[key]})
             except:
                 pass
         
         # gets all results if no filter is provided
-        if filter_set is None:
-            filter_set = model.objects.all()
+        if queryset is None:
+            queryset = model.objects.all()
 
         # paginate results
         after = params.get("after")
 
-        
         # First
         if params.get('first'):
             first = int(params.get('first'))
         else:
             first = 100
 
-        paginator = CursorPaginator(filter_set, ordering=('-created_at', '-id'))
-        
+        paginator = CursorPaginator(queryset, ordering=('id', 'created_at'))
 
-         # TODO using after creates database errors
+        # TODO must support before + last params
         page = paginator.page(first=first, after=after)
-
 
         # Convert model instances to dictionaries
         data = list(map(serializers.model_to_dict, page))
@@ -54,7 +80,8 @@ def read_many(model):
         return JsonResponse({
             'has_next_page': page.has_next,
             # TODO page index may not exist
-            'last_cursor': paginator.cursor(page[0]),
+            'first_cursor': paginator.cursor(page[0]),
+            'last_cursor': paginator.cursor(page[-1]),
             'data': data,
         })
         

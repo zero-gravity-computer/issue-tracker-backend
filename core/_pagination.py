@@ -35,6 +35,9 @@ def apply_pagination(queryset, first, after):
     return page
 
 
+'''
+
+TESTING MATERIALS:
 
 from core import models
 c = models.Contributor.objects.all()
@@ -42,3 +45,5 @@ x = c[4]
 cursor = encode_cursor(x)
 page = apply_pagination(c, 8, cursor)
 print(page)
+
+'''
