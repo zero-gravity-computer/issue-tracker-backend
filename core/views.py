@@ -67,9 +67,18 @@ def read_many(model):
         if params.get('first'):
             first = int(params.get('first'))
         else:
-            first = 100
+            first = None
+        
+        # Before
+        before = params.get("before")
 
-        page = list(get_page(queryset, first, after))
+        # Last
+        if params.get('last'):
+            last = int(params.get('last'))
+        else:
+            last = None
+
+        page = list(get_page(queryset, first, last, after, before))
 
         # Convert model instances to dictionaries
         data = list(map(serializers.model_to_dict, page))

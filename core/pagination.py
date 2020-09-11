@@ -27,16 +27,29 @@ def decode_cursor(cursor):
         "created_at": field_strings[1],
     }
 
-def get_page(queryset, first, after=None):
-    if after is None:
-        page = queryset.all()[:first]
-        return page
+def get_page(queryset, first, last, after=None, before=None):
+    if first:
+        if after is None:
+            page = queryset.all()[:first]
+            return page
+        else:
+            fields = decode_cursor(after)
+            id = fields["id"]
+            created_at = fields["created_at"]
+            page = queryset.filter(id__gt=id, created_at__gt=created_at)[:first]
+            return page
+    elif last:
+        if before is None:
+            page = list(queryset.all())[-last:]
+            return page
+        else:
+            fields = decode_cursor(before)
+            id = fields["id"]
+            created_at = fields["created_at"]
+            page = list(queryset.filter(id__lt=id, created_at__lt=created_at))[-last:]
+            return page
     else:
-        fields = decode_cursor(after)
-        id = fields["id"]
-        created_at = fields["created_at"]
-        page = queryset.filter(id__gt=id, created_at__gt=created_at)[:first]
-        return page
+        return queryset
 
 
 #Testing Materials
