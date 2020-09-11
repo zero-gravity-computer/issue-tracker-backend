@@ -27,7 +27,7 @@ def decode_cursor(cursor):
         "created_at": field_strings[1],
     }
 
-def apply_pagination(queryset, first, after):
+def get_page(queryset, first, after):
     fields = decode_cursor(after)
     id = fields["id"]
     created_at = fields["created_at"]
@@ -43,7 +43,7 @@ from core import models
 c = models.Contributor.objects.all()
 x = c[4]
 cursor = encode_cursor(x)
-page = apply_pagination(c, 8, cursor)
+page = get_page(c, 8, cursor)
 print(page)
 
 '''
