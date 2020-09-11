@@ -3,7 +3,7 @@ import core
 from core import models, serializers
 import json
 from django.views.decorators.csrf import csrf_exempt
-from core.pagination import CursorPaginator
+from core.pagination import get_page, encode_cursor
 import dateutil.parser
 from django.db.models.fields import DateTimeField
 from django.utils.timezone import make_aware
@@ -69,19 +69,16 @@ def read_many(model):
         else:
             first = 100
 
-        paginator = CursorPaginator(queryset, ordering=('id', 'created_at'))
-
-        # TODO must support before + last params
-        page = paginator.page(first=first, after=after)
+        page = list(get_page(queryset, first, after))
 
         # Convert model instances to dictionaries
         data = list(map(serializers.model_to_dict, page))
 
         return JsonResponse({
-            'has_next_page': page.has_next,
+            # this needs replaced -->'has_next_page': page.has_next,
             # TODO page index may not exist
-            'first_cursor': paginator.cursor(page[0]),
-            'last_cursor': paginator.cursor(page[-1]),
+            'first_cursor': encode_cursor(page[0]),
+            'last_cursor': encode_cursor(page[-1]),
             'data': data,
         })
         
