@@ -49,10 +49,12 @@ def paginate(queryset, first, last, after=None, before=None):
             }
     elif last:
         if before is None:
-            page = queryset.all()[len(queryset)-last:]
+            extended_page_index = max(0, len(queryset)-last-1)
+            extended_page = queryset.all()[extended_page_index:]
+            page = extended_page[len(extended_page)-last:]
             return {
                 "page": page,
-                "has_next_page": False
+                "has_next_page": len(extended_page) > len(page)
             }
         else:
             fields = decode_cursor(before)
