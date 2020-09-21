@@ -30,10 +30,11 @@ def decode_cursor(cursor):
 def paginate(queryset, first, last, after=None, before=None):
     if first:
         if after is None:
-            page = queryset.all()[:first]
+            extended_page = queryset.all()[:first+1]
+            page = extended_page[:first]
             return {
                 "page": page,
-                "has_next_page": False
+                "has_next_page": len(extended_page) > len(page)
             }
         else:
             fields = decode_cursor(after)
