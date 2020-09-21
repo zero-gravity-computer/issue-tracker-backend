@@ -3,7 +3,7 @@ import core
 from core import models, serializers
 import json
 from django.views.decorators.csrf import csrf_exempt
-from core.pagination import get_page, encode_cursor
+from core.pagination import paginate, encode_cursor
 import dateutil.parser
 from django.db.models.fields import DateTimeField
 from django.utils.timezone import make_aware
@@ -78,7 +78,7 @@ def read_many(model):
         else:
             last = None
 
-        pagination = get_page(queryset, first, last, after, before)
+        pagination = paginate(queryset, first, last, after, before)
         page = list(pagination['page'])
         has_next_page = pagination['has_next_page']
 

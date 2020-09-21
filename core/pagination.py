@@ -27,7 +27,7 @@ def decode_cursor(cursor):
         "created_at": field_strings[1],
     }
 
-def get_page(queryset, first, last, after=None, before=None):
+def paginate(queryset, first, last, after=None, before=None):
     if first:
         if after is None:
             page = queryset.all()[:first]
