@@ -41,10 +41,11 @@ def paginate(queryset, first, last, after=None, before=None):
             id = fields["id"]
             created_at = fields["created_at"]
             filtered_qs = queryset.filter(id__gt=id, created_at__gt=created_at)
-            page = filtered_qs[:first]
+            extended_page = filtered_qs[:first+1]
+            page = extended_page[:first]
             return {
                 "page": page,
-                "has_next_page": False
+                "has_next_page": len(extended_page) > len(page)
             }
     elif last:
         if before is None:
