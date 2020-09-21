@@ -31,25 +31,37 @@ def get_page(queryset, first, last, after=None, before=None):
     if first:
         if after is None:
             page = queryset.all()[:first]
-            return page
+            return {
+                "page": page,
+                "has_next_page": False
+            }
         else:
             fields = decode_cursor(after)
             id = fields["id"]
             created_at = fields["created_at"]
             filtered_qs = queryset.filter(id__gt=id, created_at__gt=created_at)
             page = filtered_qs[:first]
-            return page
+            return {
+                "page": page,
+                "has_next_page": False
+            }
     elif last:
         if before is None:
             page = queryset.all()[len(queryset)-last:]
-            return page
+            return {
+                "page": page,
+                "has_next_page": False
+            }
         else:
             fields = decode_cursor(before)
             id = fields["id"]
             created_at = fields["created_at"]
             filtered_qs = queryset.filter(id__lt=id, created_at__lt=created_at)
             page = filtered_qs[len(filtered_qs)-last:]
-            return page
+            return {
+                "page": page,
+                "has_next_page": False
+            }
     else:
         return queryset
 

@@ -78,16 +78,20 @@ def read_many(model):
         else:
             last = None
 
-        page = list(get_page(queryset, first, last, after, before))
+        pagination = get_page(queryset, first, last, after, before)
+        page = list(pagination['page'])
+        has_next_page = pagination['has_next_page']
 
         # Convert model instances to dictionaries
         data = list(map(serializers.model_to_dict, page))
 
         return JsonResponse({
             # this needs replaced -->'has_next_page': page.has_next,
+
             # TODO page index may not exist
             'first_cursor': encode_cursor(page[0]),
             'last_cursor': encode_cursor(page[-1]),
+            'has_next_page': has_next_page,
             'data': data,
         })
         
