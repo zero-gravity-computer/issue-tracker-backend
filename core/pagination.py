@@ -36,17 +36,19 @@ def get_page(queryset, first, last, after=None, before=None):
             fields = decode_cursor(after)
             id = fields["id"]
             created_at = fields["created_at"]
-            page = queryset.filter(id__gt=id, created_at__gt=created_at)[:first]
+            filtered_qs = queryset.filter(id__gt=id, created_at__gt=created_at)
+            page = filtered_qs[:first]
             return page
     elif last:
         if before is None:
-            page = list(queryset.all())[-last:]
+            page = queryset.all()[len(queryset)-last:]
             return page
         else:
             fields = decode_cursor(before)
             id = fields["id"]
             created_at = fields["created_at"]
-            page = list(queryset.filter(id__lt=id, created_at__lt=created_at))[-last:]
+            filtered_qs = queryset.filter(id__lt=id, created_at__lt=created_at)
+            page = filtered_qs[len(filtered_qs)-last:]
             return page
     else:
         return queryset
