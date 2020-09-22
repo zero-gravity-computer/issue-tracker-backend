@@ -61,17 +61,7 @@ def paginate(queryset, first, last, after=None, before=None):
             id = fields["id"]
             created_at = fields["created_at"]
             filtered_qs = queryset.filter(id__lt=id, created_at__lt=created_at)
-            #print(len(filtered_qs))
-            extended_page_index = max(0, len(filtered_qs)-last-1)
-            #print(extended_page_index)
-            extended_page = filtered_qs[extended_page_index:]
-            #print(len(extended_page))
-            #print("len(filtered_qs)-last" )
-            #print(len(filtered_qs)-last)
             page = filtered_qs[max(0, len(filtered_qs)-last):]
-            #print(len(page))
-            #print(last)
-            #print(len(extended_page) > len(page))
             return {
                 "page": page,
                 "has_next_page": len(filtered_qs)-last >= 0
