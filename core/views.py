@@ -50,50 +50,52 @@ def read_many(model):
                         return JsonResponse({"errors": [invalid_date_err]})
 
         #applies smart filters from django
-        for key in params:
-            try:
-                queryset = model.objects.filter(**{key : params[key]})
-            except:
-                pass
-        
-        # gets all results if no filter is provided
-        if queryset is None:
-            queryset = model.objects.all()
+        try:
+            for key in params:
+                try:
+                    queryset = model.objects.filter(**{key : params[key]})
+                except:
+                    pass
+            
+            # gets all results if no filter is provided
+            if queryset is None:
+                queryset = model.objects.all()
 
-        # paginate results
-        after = params.get("after")
+            # paginate results
+            after = params.get("after")
 
-        # First
-        if params.get('first'):
-            first = int(params.get('first'))
-        else:
-            first = None
-        
-        # Before
-        before = params.get("before")
+            # First
+            if params.get('first'):
+                first = int(params.get('first'))
+            else:
+                first = None
+            
+            # Before
+            before = params.get("before")
 
-        # Last
-        if params.get('last'):
-            last = int(params.get('last'))
-        else:
-            last = None
-        if not first and not last:
-            first = 50
-        pagination = paginate(queryset, first, last, after, before)
-        page = list(pagination['page'])
-        has_next_page = pagination['has_next_page']
+            # Last
+            if params.get('last'):
+                last = int(params.get('last'))
+            else:
+                last = None
+            if not first and not last:
+                first = 50
 
-        # Convert model instances to dictionaries
-        data = list(map(serializers.model_to_dict, page))
+            pagination = paginate(queryset, first, last, after, before)
+            page = list(pagination['page'])
+            has_next_page = pagination['has_next_page']
 
-        return JsonResponse({
-            # TODO page index may not exist
-            'first_cursor': encode_cursor(page[0]),
-            'last_cursor': encode_cursor(page[-1]),
-            'has_next_page': has_next_page,
-            'data': data,
-        })
-        
+            # Convert model instances to dictionaries
+            data = list(map(serializers.model_to_dict, page))
+
+            return JsonResponse({
+                'first_cursor': encode_cursor(page[0]),
+                'last_cursor': encode_cursor(page[-1]),
+                'has_next_page': has_next_page,
+                'data': data,
+            })
+        except:
+            return JsonResponse({"invalid parameters" : "pagination parameters did not meet requirements"})
     return request_handler
 
 
