@@ -37,7 +37,6 @@ def read_many(model):
         params = { key: request.GET.get(key) for key in request.GET }
         queryset = None
 
-        # Parsing incoming date fields
         for key in params:
             for field in date_fields(model):
                 if key.startswith(field):
@@ -49,7 +48,6 @@ def read_many(model):
                         invalid_date_err = { "message": message }
                         return JsonResponse({"errors": [invalid_date_err]})
 
-        #applies smart filters from django
         try:
             for key in params:
                 try:
@@ -57,23 +55,18 @@ def read_many(model):
                 except:
                     pass
             
-            # gets all results if no filter is provided
             if queryset is None:
                 queryset = model.objects.all()
 
-            # paginate results
             after = params.get("after")
 
-            # First
             if params.get('first'):
                 first = int(params.get('first'))
             else:
                 first = None
-            
-            # Before
+        
             before = params.get("before")
 
-            # Last
             if params.get('last'):
                 last = int(params.get('last'))
             else:
@@ -84,8 +77,7 @@ def read_many(model):
             pagination = paginate(queryset, first, last, after, before)
             page = list(pagination['page'])
             has_next_page = pagination['has_next_page']
-
-            # Convert model instances to dictionaries
+            
             data = list(map(serializers.model_to_dict, page))
 
             return JsonResponse({
