@@ -49,6 +49,7 @@ def read_many(model):
                         invalid_date_err = { "message": message }
                         return JsonResponse({"errors": [invalid_date_err]})
 
+        # Collecting filter parameters
         for key in params:
             try:
                 queryset = model.objects.filter(**{key : params[key]})
@@ -58,6 +59,8 @@ def read_many(model):
         if queryset is None:
             queryset = model.objects.all()
 
+        # Collecting pagination parameters
+        before = params.get("before")
         after = params.get("after")
 
         if params.get('first'):
@@ -65,12 +68,13 @@ def read_many(model):
         else:
             first = None
 
-        before = params.get("before")
-
         if params.get('last'):
             last = int(params.get('last'))
         else:
             last = None
+
+        # Assigning a default page size
+        # if none was provided.
         if not first and not last:
             first = 50
 
