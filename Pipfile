@@ -8,8 +8,6 @@ verify_ssl = true
 [packages]
 django = "*"
 faker = "*"
-#django-cursor-pagination = "*"
-#django-utils-six = "*"
 
 [requires]
 python_version = "3"
