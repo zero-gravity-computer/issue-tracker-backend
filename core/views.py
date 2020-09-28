@@ -3,6 +3,7 @@ import core
 from core import models, serializers
 import json
 from django.views.decorators.csrf import csrf_exempt
+from core.pagination import paginate, encode_cursor
 import dateutil.parser
 from django.db.models.fields import DateTimeField
 from django.utils.timezone import make_aware
@@ -12,9 +13,10 @@ id_not_exists_err = {"message": "Requested id does not exist" }
 empty_body_err = {"message" : "Request body is empty"}
 no_body_err = {"message" : "Request body does not exist"}
 invalid_json_err = {"message" : "Request body is not valid json"}
-missing_id_err = {"message" : "required id not provided"}
-invalid_data_err = {"message" : "invalid data type received"}
-unsupported_method_err = {"message" : "request method not supported by url"}
+missing_id_err = {"message" : "Required id not provided"}
+invalid_data_err = {"message" : "Invalid data type received"}
+unsupported_method_err = {"message" : "Request method not supported by url"}
+invalid_paginagion_params_err = {"message" : "Invalid pagination parameters provided"}
 
 
 
@@ -34,9 +36,8 @@ def date_fields(model):
 def read_many(model):
     def request_handler(request):
         params = { key: request.GET.get(key) for key in request.GET }
-        filter_set=None
+        queryset = None
 
-        # Parsing incoming date fields
         for key in params:
             for field in date_fields(model):
                 if key.startswith(field):
@@ -48,21 +49,52 @@ def read_many(model):
                         invalid_date_err = { "message": message }
                         return JsonResponse({"errors": [invalid_date_err]})
 
-        #applies smart filters from django
+        # Collecting filter parameters
         for key in params:
             try:
-                filter_set = model.objects.filter(**{key : params[key]})
+                queryset = model.objects.filter(**{key : params[key]})
             except:
                 pass
-        
-        #gets all results if no filter is provided
-        if filter_set is None:
-            filter_set = model.objects.all()
 
-        #retrieves results
-        data = list(map(serializers.model_to_dict, filter_set))
-        return JsonResponse({"data": data})
+        if queryset is None:
+            queryset = model.objects.all()
 
+        # Collecting pagination parameters
+        before = params.get("before")
+        after = params.get("after")
+
+        if params.get('first'):
+            first = int(params.get('first'))
+        else:
+            first = None
+
+        if params.get('last'):
+            last = int(params.get('last'))
+        else:
+            last = None
+
+        # Assigning a default page size
+        # if none was provided.
+        if not first and not last:
+            first = 50
+
+        try:
+            pagination = paginate(queryset, first, last, after, before)
+        except:
+            return JsonResponse({"errors": [invalid_pagination_params_err]})
+            
+        page = list(pagination['page'])
+        has_next_page = pagination['has_next_page']
+
+        data = list(map(serializers.model_to_dict, page))
+
+        return JsonResponse({
+            'first_cursor': encode_cursor(page[0]),
+            'last_cursor': encode_cursor(page[-1]),
+            'has_next_page': has_next_page,
+            'data': data,
+        })
+    
     return request_handler
 
 
