@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 django = "*"
 faker = "*"
+django-instant-rest = {editable = true,git = "https://github.com/zero-gravity-computer/django_instant_rest.git"}
 
 [requires]
 python_version = "3"
