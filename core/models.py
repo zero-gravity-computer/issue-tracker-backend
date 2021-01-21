@@ -1,6 +1,12 @@
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser
 from django import forms
+from argon2
+
+ph.hash("s3kr3tp4ssw0rd")
+ph.verify(hash, self.password)
+ph.check_needs_rehash(hash)
+ph.verify(hash, "t0t411ywr0ng")
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -8,9 +14,13 @@ class TimeStampedModel(models.Model):
     class Meta:
         abstract = True
 
-class Contributor(TimeStampedModel, AbstractBaseUser):
+class Contributor(TimeStampedModel):
     username = models.CharField(max_length=15, unique=True)
     USERNAME_FIELD = "username"
+    password = models.CharField(max_length=200)
+    def save(self, *args, **kwargs):
+        self.password = "something_else"
+        super(Contributor, self).save(*args, **kwargs)
     email = models.EmailField(max_length=300)
     bio = models.CharField(max_length=1000)
     
