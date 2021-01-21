@@ -22,8 +22,8 @@ class Contributor(TimeStampedModel):
         self.password = ph.hash(self.password)
         super(Contributor, self).save(*args, **kwargs)
 
-    def verify_password(password):
-        return ph.verify(hash, self.password)
+    def verify_password(self, password):
+        return ph.verify(self.password, password)
 
 
 class Organization(models.Model):
