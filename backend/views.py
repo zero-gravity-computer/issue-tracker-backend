@@ -1,10 +1,9 @@
-from core.models import Contributor
-from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import json
+from core.models import Contributor
 from django.http import JsonResponse
-import jwt
 from .settings import SECRET_KEY
+import json
+import jwt
 
 
 @csrf_exempt
@@ -25,5 +24,3 @@ def authenticate(request):
     except:
         message = "incorrect username/password combination"
         return JsonResponse({'error':message}, status=400)
-    
-
