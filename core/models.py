@@ -17,10 +17,13 @@ class Contributor(TimeStampedModel):
     password = models.CharField(max_length=200)
     email = models.EmailField(max_length=300)
     bio = models.CharField(max_length=1000)
+
     def save(self, *args, **kwargs):
         self.password = ph.hash(self.password)
-        super(Contributor, self).save(*args, **kwargs) 
-    
+        super(Contributor, self).save(*args, **kwargs)
+
+    def verify_password(password):
+        return ph.verify(hash, self.password)
 
 
 class Organization(models.Model):
