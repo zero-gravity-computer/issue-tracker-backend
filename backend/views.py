@@ -9,10 +9,8 @@ from .settings import SECRET_KEY
 
 @csrf_exempt
 def authenticate(request):
-    #invalid json provided
-    #invalid username
-    #password wrong
-    #wrong request method
+    '''allowing requests to provide username/password
+    combinations in exchange for json web token'''
     try:
         credentials = json.loads(request.body.decode("utf-8"))
     except:
