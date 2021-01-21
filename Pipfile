@@ -10,6 +10,7 @@ django = "*"
 faker = "*"
 django-instant-rest = {editable = true,git = "https://github.com/django-instant-rest/django-instant-rest"}
 argon2-cffi = "*"
+pyjwt = "*"
 
 [requires]
 python_version = "3"
