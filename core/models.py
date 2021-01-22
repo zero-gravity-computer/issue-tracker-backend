@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser
 from django import forms
+from argon2 import PasswordHasher
+
+ph = PasswordHasher()
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -8,12 +11,19 @@ class TimeStampedModel(models.Model):
     class Meta:
         abstract = True
 
-class Contributor(TimeStampedModel, AbstractBaseUser):
+class Contributor(TimeStampedModel):
     username = models.CharField(max_length=15, unique=True)
     USERNAME_FIELD = "username"
+    password = models.CharField(max_length=200)
     email = models.EmailField(max_length=300)
     bio = models.CharField(max_length=1000)
-    
+
+    def save(self, *args, **kwargs):
+        self.password = ph.hash(self.password)
+        super(Contributor, self).save(*args, **kwargs)
+
+    def verify_password(self, password):
+        return ph.verify(self.password, password)
 
 
 class Organization(models.Model):

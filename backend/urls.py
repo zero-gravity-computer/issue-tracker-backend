@@ -1,26 +1,16 @@
-"""backend URL Configuration
+from core.models import *
+from core.middleware import *
+from django_instant_rest import patterns
+from django.urls import path
+from .views import authenticate
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
-from core import models, patterns
 
 urlpatterns = [
-    patterns.resource('issues', models.Issue),
-    patterns.resource('contributors', models.Contributor),
-    patterns.resource('organizations', models.Organization),
-    patterns.resource('teams', models.Team),
-    patterns.resource('team_memberships', models.TeamMembership),
-    patterns.resource('comments', models.Comment),
+    patterns.resource('issues', Issue, middleware = issue_resource_policies),
+    patterns.resource('organizations', Organization),
+    patterns.resource('contributors', Contributor),
+    patterns.resource('teams', Team),
+    patterns.resource('team_memberships', TeamMembership),
+    patterns.resource('comments', Comment),
+    path('contributors/authenticate', authenticate)
 ]
