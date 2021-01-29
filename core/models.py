@@ -8,7 +8,6 @@ ph = PasswordHasher()
 
 class Contributor(RestResource):
     username = models.CharField(max_length=15, unique=True)
-    USERNAME_FIELD = "username"
     password = models.CharField(max_length=200)
     email = models.EmailField(max_length=300)
     bio = models.CharField(max_length=1000)
