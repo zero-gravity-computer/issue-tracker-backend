@@ -18,9 +18,21 @@ def authenticate(request):
     try:
         c = Contributor.objects.get(username=credentials["username"])
         c.verify_password(credentials["password"])
-        payload = {"contributor_id": c.id}
+        payload = {"contributor": {"id": c.id}}
         encoded_jwt = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         return JsonResponse({"data": {"token":encoded_jwt}})
     except:
         message = "incorrect username/password combination"
+        return JsonResponse({'error':message}, status=400)
+
+def get_contributor_by_token(request):
+    try:
+        token = request.GET.get('token', '')
+        if token == "":
+            message = "expected GET request with \"token\" query parameter"
+            return JsonResponse({'error':message}, status=400)
+        payload = jwt.decode(token, SECRET_KEY, algorithms='HS256')
+        return JsonResponse({"data": payload})
+    except:
+        message = "invalid token"
         return JsonResponse({'error':message}, status=400)

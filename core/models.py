@@ -2,16 +2,11 @@ from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser
 from django import forms
 from argon2 import PasswordHasher
+from django_instant_rest.models import RestResource
 
 ph = PasswordHasher()
 
-class TimeStampedModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    class Meta:
-        abstract = True
-
-class Contributor(TimeStampedModel):
+class Contributor(RestResource):
     username = models.CharField(max_length=15, unique=True)
     USERNAME_FIELD = "username"
     password = models.CharField(max_length=200)
@@ -26,10 +21,10 @@ class Contributor(TimeStampedModel):
         return ph.verify(self.password, password)
 
 
-class Organization(models.Model):
+class Organization(RestResource):
     name = models.CharField(max_length=80, unique=True)
 
-class Team(TimeStampedModel):
+class Team(RestResource):
     name = models.CharField(max_length=80)
     organization = models.ForeignKey(
         Organization,
@@ -37,7 +32,7 @@ class Team(TimeStampedModel):
     )
 
     
-class TeamMembership(TimeStampedModel):
+class TeamMembership(RestResource):
     contributor = models.ForeignKey(
         Contributor,
         on_delete=models.CASCADE
@@ -47,7 +42,7 @@ class TeamMembership(TimeStampedModel):
         on_delete=models.CASCADE
     )
 
-class Issue(TimeStampedModel):
+class Issue(RestResource):
    
     class Severity(models.TextChoices):
         low = 'Low'
@@ -81,7 +76,7 @@ class Issue(TimeStampedModel):
         Organization,
         on_delete=models.CASCADE,
     )
-class Comment(TimeStampedModel):
+class Comment(RestResource):
     body = models.CharField(max_length=2048)
     author = models.ForeignKey(
         Contributor,
